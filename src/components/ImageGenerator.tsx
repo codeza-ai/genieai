@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import {
     Select,
     SelectContent,
@@ -13,7 +13,7 @@ import { Crown, Sparkle } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from './ui/skeleton';
 import axios from 'axios';
-
+import { ImageSkeleton } from '@/components/skeletons/ImageSkeleton';
 type Props = {};
 
 const ImageGenerator = (props: Props) => {
@@ -59,17 +59,19 @@ const ImageGenerator = (props: Props) => {
             <div className="flex justify-center items-center pt-10">
                 {error && <p className="text-red-500">{error}</p>}
                 {isLoading && <Skeleton className="h-[200px] w-[200px] rounded-xl my-24 shadow-xl text-center" />}
-                {!isLoading && !error &&
-                    generatedImageUrl ? (
-                    <Image
-                        src={generatedImageUrl}
-                        alt="Generated Image"
-                        width={400}
-                        height={400}
-                        className="rounded-lg"
-                    />
-                ) : <></>
-                }
+                <Suspense fallback={<ImageSkeleton/>}>
+                    {!isLoading && !error &&
+                        generatedImageUrl ? (
+                        <Image
+                            src={generatedImageUrl}
+                            alt="Generated Image"
+                            width={400}
+                            height={400}
+                            className="rounded-lg"
+                        />
+                    ) : <></>
+                    }
+                </Suspense>
             </div>
         </div>
     );
