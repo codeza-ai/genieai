@@ -1,19 +1,19 @@
 'use client'
-import React, { Suspense, useState } from 'react';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import React, { useState } from 'react';
+// import {
+//     Select,
+//     SelectContent,
+//     SelectItem,
+//     SelectTrigger,
+//     SelectValue,
+// } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Crown, Sparkle } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from './ui/skeleton';
 import axios from 'axios';
-import { ImageSkeleton } from '@/components/skeletons/ImageSkeleton';
+// import { ImageSkeleton } from '@/components/skeletons/ImageSkeleton';
 type Props = {};
 
 const ImageGenerator = (props: Props) => {
@@ -37,8 +37,18 @@ const ImageGenerator = (props: Props) => {
             setGeneratedImageUrl(response.data.image_url);
         } catch (err) {
             console.error('Error generating image:', err);
+            setError('Failed to generate image.');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDownload = () => {
+        if (generatedImageUrl) {
+            const link = document.createElement('a');
+            link.href = generatedImageUrl;
+            link.download = 'generated_image.png';
+            link.click();
         }
     };
 
@@ -58,10 +68,9 @@ const ImageGenerator = (props: Props) => {
             </div>
             <div className="flex justify-center items-center pt-10">
                 {error && <p className="text-red-500">{error}</p>}
-                {isLoading && <Skeleton className="h-[200px] w-[200px] rounded-xl my-24 shadow-xl text-center" />}
-                <Suspense fallback={<ImageSkeleton/>}>
-                    {!isLoading && !error &&
-                        generatedImageUrl ? (
+                {isLoading && <Skeleton className="h-[400px] w-[600px] rounded-xl my-24 shadow-xl text-center bg-transparent" />}
+                {!isLoading && !error && generatedImageUrl ? (
+                    <div className="flex flex-col items-center space-y-4 gap-4">
                         <Image
                             src={generatedImageUrl}
                             alt="Generated Image"
@@ -69,9 +78,15 @@ const ImageGenerator = (props: Props) => {
                             height={400}
                             className="rounded-lg"
                         />
-                    ) : <></>
-                    }
-                </Suspense>
+                        <Button
+                            onClick={handleDownload}
+                            disabled={!generatedImageUrl}
+                            className='rounded-full'
+                        >
+                            Download Image
+                        </Button>
+                    </div>
+                ) : <></>}
             </div>
         </div>
     );
